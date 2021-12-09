@@ -89,8 +89,13 @@ fn main() -> Result<()> {
         // Windows with a matching WM_CLASS will always float
         .floating_classes(vec!["dmenu", "dunst", "polybar", "rofi"])
         // Client border colors are set based on X focus
-        .focused_border("#a7bec1")?
-        .unfocused_border("#1b4552")?;
+        .focused_border("#1b4552")?
+        .unfocused_border("#0c1014")?
+        .border_px(2)
+        .gap_px(7)
+        .show_bar(true)
+        .top_bar(true)
+        .bar_height(19);
 
     // When specifying a layout, most of the time you will want LayoutConf::default() as shown
     // below, which will honour gap settings and will not be run on focus changes (only when
@@ -121,19 +126,18 @@ fn main() -> Result<()> {
     // Now build and validate the config
     let config = config_builder.build().unwrap();
 
-    // NOTE: change these to programs that you have installed!
-    let my_program_launcher = "rofi -show drun";
-    let my_file_manager = "thunar";
-    let my_terminal = "kitty";
-
-    //#
+    // My programs
+    let program_launcher = "rofi -show drun";
+    let file_manager     = "thunar";
+    let terminal         = "kitty";
+    let browser          = "firefox-developer-edition";
 
     let bar = dwm_bar(
         XcbDraw::new()?,
-        18,
+        19,
         &TextStyle {
             font: "FiraCode Nerd Font Mono Regular".to_string(),
-            point_size: 10,
+            point_size: 12,
             fg: Color::try_from("#a7bec1")?,
             bg: Some(Color::try_from("#0c1014")?),
             padding: (2.0, 2.0),
@@ -156,7 +160,8 @@ fn main() -> Result<()> {
     // Scratchpad is an extension: it makes use of the same Hook points as the examples below but
     // additionally provides a 'toggle' method that can be bound to a key combination in order to
     // trigger the bound scratchpad client.
-    let sp = Scratchpad::new(my_terminal, 0.8, 0.8);
+    // its a popup terminal
+    let sp = Scratchpad::new(terminal, 0.8, 0.8);
 
     let hooks: XcbHooks = vec![
         //Box::new(MyClientHook {}),
@@ -188,57 +193,80 @@ fn main() -> Result<()> {
      */
     let key_bindings = gen_keybindings! {
         // Program launch
-        "M-a" => run_external!(my_program_launcher);
-        "M-Return" => run_external!(my_terminal);
-        "M-S-Return" => run_external!(my_file_manager);
+        "M-a"        => run_external!(program_launcher);
+        "M-Return"   => run_external!(terminal);
+        "M-S-Return" => run_external!(file_manager);
+        "M-w"        => run_external!(browser);
+
 
         // brightness management
-        "A-F8" => run_external!("light -A 10");
-        "A-F7" => run_external!("light -U 10");
-        "A-F6" => run_external!("light -S 0");
-        "A-F5" => run_external!("light -S 100");
+        "A-F8"                  => run_external!("light -A 10");
+        "XF86MonBrightnessUp"   => run_external!("light -A 10");
+
+        "A-F7"                  => run_external!("light -U 10");
+        "XF86MonBrightnessDown" => run_external!("light -U 10");
+
+        "A-F6"                  => run_external!("light -S 0");
+        "A-F5"                  => run_external!("light -S 100");
+
 
         // output sound management
-        "A-F1" => run_external!("amixer -D pulse sset Master toggle");
-        "A-F2" => run_external!("amixer -D pulse sset Master '5%-'");
-        "A-F3" => run_external!("amixer -D pulse sset Master '5%+'");
+        "A-F1"                 => run_external!("amixer -D pulse sset Master toggle");
+        "XF86AudioMute"        => run_external!("amixer -D pulse sset Master toggle");
+
+        "A-F2"                 => run_external!("amixer -D pulse sset Master '5%-'");
+        "XF86AudioLowerVolume" => run_external!("amixer -D pulse sset Master '5%-'");
+
+        "A-F3"                 => run_external!("amixer -D pulse sset Master '5%+'");
+        "XF86AudioRaiseVolume" => run_external!("amixer -D pulse sset Master '5%+'");
+
 
         // input sound management
-        "A-S-F2" => run_external!("amixer -D pulse sset Capture '5%-'");
-        "A-S-F3" => run_external!("amixer -D pulse sset Capture '5%+'");
-        "A-F4" => run_external!("amixer -D pulse sset Capture toggle");
+        "A-S-F2"           => run_external!("amixer -D pulse sset Capture '5%-'");
+        "A-S-F3"           => run_external!("amixer -D pulse sset Capture '5%+'");
+
+        // NOTE: wait for this to be fixed
+        // "XF86AudioMicMute" => run_external!("amixer -D pulse sset Capture toggle");
+        "A-F4"             => run_external!("amixer -D pulse sset Capture toggle");
+
+
+        // TODO: multimedia
+
 
         // screenshots
-        "Print" => run_external!("flameshot gui");
+        "M-p" => run_external!("flameshot gui");
+
 
         // client management
-        "M-j" => run_internal!(cycle_client, Forward);
-        "M-k" => run_internal!(cycle_client, Backward);
-        "M-h" => run_internal!(cycle_client, Backward);
-        "M-l" => run_internal!(cycle_client, Forward);
+        "M-j"   => run_internal!(cycle_client, Forward);
+        "M-k"   => run_internal!(cycle_client, Backward);
+        "M-h"   => run_internal!(cycle_client, Backward);
+        "M-l"   => run_internal!(cycle_client, Forward);
         "M-S-j" => run_internal!(drag_client, Forward);
         "M-S-k" => run_internal!(drag_client, Backward);
-        "M-q" => run_internal!(kill_client);
-        "M-f" => run_internal!(toggle_client_fullscreen, &Selector::Focused);
-        "M-s" => sp.toggle(); // smaller popup terminal in middle of screen
+        "M-q"   => run_internal!(kill_client);
+        "M-f"   => run_internal!(toggle_client_fullscreen, &Selector::Focused);
+        "M-s"   => sp.toggle(); // smaller popup terminal in middle of screen
+
 
         // workspace management
-        "M-Tab" => run_internal!(toggle_workspace);
-        "M-bracketright" => run_internal!(cycle_screen, Forward);
-        "M-bracketleft" => run_internal!(cycle_screen, Backward);
+        "M-Tab"            => run_internal!(toggle_workspace);
+        "M-bracketright"   => run_internal!(cycle_screen, Forward);
+        "M-bracketleft"    => run_internal!(cycle_screen, Backward);
         "M-S-bracketright" => run_internal!(drag_workspace, Forward);
-        "M-S-bracketleft" => run_internal!(drag_workspace, Backward);
+        "M-S-bracketleft"  => run_internal!(drag_workspace, Backward);
+
 
         // Layout management
-        "M-grave" => run_internal!(cycle_layout, Forward);
-        "M-S-grave" => run_internal!(cycle_layout, Backward);
-        "M-A-Up" => run_internal!(update_max_main, More);
-        "M-A-Down" => run_internal!(update_max_main, Less);
-        "M-A-Right" => run_internal!(update_main_ratio, More);
-        "M-A-Left" => run_internal!(update_main_ratio, Less);
-
-        "M-A-s" => run_internal!(detect_screens);
+        "M-grave"    => run_internal!(cycle_layout, Forward);
+        "M-S-grave"  => run_internal!(cycle_layout, Backward);
+        "M-A-Up"     => run_internal!(update_max_main, More);
+        "M-A-Down"   => run_internal!(update_max_main, Less);
+        "M-A-Right"  => run_internal!(update_main_ratio, More);
+        "M-A-Left"   => run_internal!(update_main_ratio, Less);
+        "M-A-s"      => run_internal!(detect_screens);
         "M-A-Escape" => run_internal!(exit);
+
 
         // Each keybinding here will be templated in with the workspace index of each workspace,
         // allowing for common workspace actions to be bound at once.
