@@ -1,3 +1,6 @@
+// TODO: add bar functionality
+
+
 #[macro_use]
 extern crate penrose;
 
@@ -127,7 +130,7 @@ fn main() -> Result<()> {
     let config = config_builder.build().unwrap();
 
     // My programs
-    let program_launcher = "rofi -show drun";
+    let program_launcher = "rofi -no-lazy-grab -show drun -modi drun -theme /home/micah/.config/rofi/launchers/misc/launchpad.rasi";
     let file_manager     = "thunar";
     let terminal         = "kitty";
     let browser          = "firefox-developer-edition";
@@ -197,6 +200,12 @@ fn main() -> Result<()> {
         "M-Return"   => run_external!(terminal);
         "M-S-Return" => run_external!(file_manager);
         "M-w"        => run_external!(browser);
+        "M-d"        => run_external!("discord");
+        "M-e"        => run_external!("mattermost-desktop");
+
+
+        // xkill
+        "M-S-x" => run_external!("xkill");
 
 
         // brightness management
@@ -211,30 +220,37 @@ fn main() -> Result<()> {
 
 
         // output sound management
-        "A-F1"                 => run_external!("amixer -D pulse sset Master toggle");
-        "XF86AudioMute"        => run_external!("amixer -D pulse sset Master toggle");
+        // TODO: figure out why these dont work
+        "A-F1"                 => run_external!("pulseaudio-ctl mute");
+        "XF86AudioMute"        => run_external!("pulseaudio-ctl mute");
 
-        "A-F2"                 => run_external!("amixer -D pulse sset Master '5%-'");
-        "XF86AudioLowerVolume" => run_external!("amixer -D pulse sset Master '5%-'");
+        "A-F2"                 => run_external!("pulseaudio-ctl down");
+        "XF86AudioLowerVolume" => run_external!("pulseaudio-ctl down");
 
-        "A-F3"                 => run_external!("amixer -D pulse sset Master '5%+'");
-        "XF86AudioRaiseVolume" => run_external!("amixer -D pulse sset Master '5%+'");
+        "A-F3"                 => run_external!("pulseaudio-ctl up");
+        "XF86AudioRaiseVolume" => run_external!("pulseaudio-ctl up");
 
 
         // input sound management
+        // TODO: check if these work
         "A-S-F2"           => run_external!("amixer -D pulse sset Capture '5%-'");
         "A-S-F3"           => run_external!("amixer -D pulse sset Capture '5%+'");
 
-        // NOTE: wait for this to be fixed
+        // NOTE: wait for this to be added
         // "XF86AudioMicMute" => run_external!("amixer -D pulse sset Capture toggle");
-        "A-F4"             => run_external!("amixer -D pulse sset Capture toggle");
+        "A-F4"             => run_external!("pulseaudio-ctl mute-input");
 
 
-        // TODO: multimedia
+        // multimedia
+        "A-F9"  => run_external!("playerctl play-pause");
+        "A-F10" => run_external!("playerctl previous");
+        "A-F11" => run_external!("playerctl next");
+        "A-F12" => run_external!("playerctl stop");
 
 
         // screenshots
-        "M-p" => run_external!("flameshot gui");
+        "M-p"   => run_external!("flameshot gui");
+        "A-p"   => run_external!("flameshot gui");
 
 
         // client management
