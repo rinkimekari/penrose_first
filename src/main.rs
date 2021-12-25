@@ -221,24 +221,24 @@ fn main() -> Result<()> {
 
         // output sound management
         // TODO: figure out why these dont work
-        "A-F1"                 => run_external!("pulseaudio-ctl mute");
-        "XF86AudioMute"        => run_external!("pulseaudio-ctl mute");
+        "A-F1"                 => run_external!("/usr/bin/pulseaudio-ctl mute");
+        "XF86AudioMute"        => run_external!("/usr/bin/pulseaudio-ctl mute");
 
-        "A-F2"                 => run_external!("pulseaudio-ctl down");
-        "XF86AudioLowerVolume" => run_external!("pulseaudio-ctl down");
+        "A-F2"                 => run_external!("/usr/bin/pulseaudio-ctl down");
+        "XF86AudioLowerVolume" => run_external!("/usr/bin/pulseaudio-ctl down");
 
-        "A-F3"                 => run_external!("pulseaudio-ctl up");
-        "XF86AudioRaiseVolume" => run_external!("pulseaudio-ctl up");
+        "A-F3"                 => run_external!("/usr/bin/pulseaudio-ctl up");
+        "XF86AudioRaiseVolume" => run_external!("/usr/bin/pulseaudio-ctl up");
 
 
         // input sound management
         // TODO: check if these work
-        "A-S-F2"           => run_external!("amixer -D pulse sset Capture '5%-'");
-        "A-S-F3"           => run_external!("amixer -D pulse sset Capture '5%+'");
+        "A-S-F2"           => run_external!("/usr/bin/amixer -D pulse sset Capture '5%-'");
+        "A-S-F3"           => run_external!("/usr/bin/amixer -D pulse sset Capture '5%+'");
 
         // NOTE: wait for this to be added
         // "XF86AudioMicMute" => run_external!("amixer -D pulse sset Capture toggle");
-        "A-F4"             => run_external!("pulseaudio-ctl mute-input");
+        "A-F4"             => run_external!("/usr/bin/pulseaudio-ctl mute-input");
 
 
         // multimedia
