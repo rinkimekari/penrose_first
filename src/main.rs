@@ -236,7 +236,7 @@ fn main() -> Result<()> {
         "A-S-F2"           => run_external!("/usr/bin/amixer -D pulse sset Capture '5%-'");
         "A-S-F3"           => run_external!("/usr/bin/amixer -D pulse sset Capture '5%+'");
 
-        // NOTE: wait for this to be added
+        // TODO: figure out why this doesnt work
         // "XF86AudioMicMute" => run_external!("amixer -D pulse sset Capture toggle");
         "A-F4"             => run_external!("/usr/bin/pulseaudio-ctl mute-input");
 
