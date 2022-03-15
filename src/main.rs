@@ -94,11 +94,11 @@ fn main() -> Result<()> {
         // Client border colors are set based on X focus
         .focused_border("#1b4552")?
         .unfocused_border("#0c1014")?
-        .border_px(2)
-        .gap_px(7)
-        .show_bar(true)
-        .top_bar(true)
-        .bar_height(19);
+        .border_px(0)     // 2
+        .gap_px(0)        // 7
+        .show_bar(false)  // true
+        .top_bar(false)   // true
+        .bar_height(0);   // 19
 
     // When specifying a layout, most of the time you will want LayoutConf::default() as shown
     // below, which will honour gap settings and will not be run on focus changes (only when
@@ -135,20 +135,20 @@ fn main() -> Result<()> {
     let terminal         = "kitty";
     let browser          = "firefox-developer-edition";
 
-    let bar = dwm_bar(
-        XcbDraw::new()?,
-        19,
-        &TextStyle {
-            font: "FiraCode Nerd Font Mono Regular".to_string(),
-            point_size: 12,
-            fg: Color::try_from("#a7bec1")?,
-            bg: Some(Color::try_from("#0c1014")?),
-            padding: (2.0, 2.0),
-        },
-        Color::try_from("#0b2030")?, // highlight
-        Color::try_from("#a7bec1")?, // empty_ws
-        config.workspaces().clone(),
-    )?;
+    // let bar = dwm_bar(
+    //     XcbDraw::new()?,
+    //     19,
+    //     &TextStyle {
+    //         font: "FiraCode Nerd Font Mono Regular".to_string(),
+    //         point_size: 12,
+    //         fg: Color::try_from("#a7bec1")?,
+    //         bg: Some(Color::try_from("#0c1014")?),
+    //         padding: (2.0, 2.0),
+    //     },
+    //     Color::try_from("#0b2030")?, // highlight
+    //     Color::try_from("#a7bec1")?, // empty_ws
+    //     config.workspaces().clone(),
+    // )?;
 
     /* hooks
      *
@@ -181,8 +181,9 @@ fn main() -> Result<()> {
         //    vec![my_terminal, my_terminal, my_file_manager],
         //),
         sp.get_hook(),
-        Box::new(bar),
+        // Box::new(bar),
         Box::new(StartupScript::new("/home/micah/.config/penrose/penrose_first/scripts/startup.sh")),
+        // spawn!(terminal),
     ];
 
     /* The gen_keybindings macro parses user friendly key binding definitions into X keycodes and
@@ -242,10 +243,12 @@ fn main() -> Result<()> {
 
 
         // multimedia
+        // "^[[57428u"
+        // | "^[[57429u"
         "A-F9"  => run_external!("playerctl play-pause");
-        "A-F10" => run_external!("playerctl previous");
-        "A-F11" => run_external!("playerctl next");
-        "A-F12" => run_external!("playerctl stop");
+        "A-F10"   => run_external!("playerctl previous");
+        "A-F11"   => run_external!("playerctl next");
+        "A-F12"   => run_external!("playerctl stop");
 
 
         // screenshots
@@ -282,6 +285,10 @@ fn main() -> Result<()> {
         "M-A-Left"   => run_internal!(update_main_ratio, Less);
         "M-A-s"      => run_internal!(detect_screens);
         "M-A-Escape" => run_internal!(exit);
+        
+
+        // Add second monitor
+        "A-S-m" => run_external!("xrandr ");
 
 
         // Each keybinding here will be templated in with the workspace index of each workspace,
